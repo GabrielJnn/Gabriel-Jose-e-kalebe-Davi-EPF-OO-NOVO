@@ -1,11 +1,20 @@
 % rebase('base.tpl')
 
-<h2>Bem-vindo ao PlantsVsTime 🌱</h2>
+<div class="grid">
+  <div>
+    <div class="card">
+      <h3>Bem-vindo</h3>
+      <p>PlantsVsTime ajuda você a cuidar das plantas. Cadastre uma planta e registre as regas.</p>
+      <div style="margin-top:10px;">
+        <a class="btn" href="/plants">Minhas Plantas</a>
+      </div>
+    </div>
+  </div>
 
-<p>Gerencie suas plantas e acompanhe regas facilmente.</p>
-
-<p>
-    <a href="/login">Login</a> |
-    <a href="/register">Registrar</a> |
-    <a href="/plants">Minhas Plantas</a>
-</p>
+  <div>
+    <div class="card">
+      <h3>Dica rápida</h3>
+      <p>Defina intervalos de rega e marque quando regar. O sistema ajuda a lembrar.</p>
+    </div>
+  </div>
+</div>

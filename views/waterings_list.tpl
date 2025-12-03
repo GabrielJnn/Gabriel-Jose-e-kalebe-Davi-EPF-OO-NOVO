@@ -1,18 +1,22 @@
 % rebase('base.tpl')
 
-<h2>Histórico de Rega</h2>
+<div>
+  <h2>Registros de Rega — {{plant['name']}}</h2>
 
-% if waterings:
-    <ul>
+  % if waterings:
     % for w in waterings:
-        <li>
-            Planta: <strong>{{w['plant_name']}}</strong><br>
-            Data: {{w['date']}}
-        </li>
+      <div class="card">
+        <p><strong>Data:</strong> {{w['date']}}</p>
+      </div>
     % end
-    </ul>
-% else:
-    <p>Nenhuma rega registrada.</p>
-% end
+  % else:
+    <div class="card">
+      <p>Sem registros ainda.</p>
+    </div>
+  % end
 
-<p><a href="/plants">Voltar</a></p>
+  <div style="margin-top:10px;">
+    <a class="btn" href="/plants/{{plant['id']}}/water">Regar Agora</a>
+    <a class="btn ghost" href="/plants">Voltar</a>
+  </div>
+</div>
