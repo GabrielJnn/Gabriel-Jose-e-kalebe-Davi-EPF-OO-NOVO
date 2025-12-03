@@ -4,15 +4,7 @@ from controllers.base_controller import BaseController
 from services.user_service import UserService
 
 auth_routes = Bottle()
-BaseController(auth_routes)  # registra / e /static no root do merge
-
-
-def _get_logged_user_id():
-    uid = request.get_cookie("user_id")
-    try:
-        return int(uid) if uid else None
-    except:
-        return None
+# BaseController já foi registrado no __init__.py para evitar rotas duplicadas
 
 
 @auth_routes.get('/login')
@@ -33,22 +25,28 @@ def login_post():
     return BaseController(auth_routes).redirect('/plants')
 
 
-@auth_routes.get('/register')
+@auth_routes.get('/signup')
 def register_get():
     return BaseController(auth_routes).render('register', error=None)
 
 
-@auth_routes.post('/register')
+@auth_routes.post('/signup')
 def register_post():
     name = request.forms.get('name')
     email = request.forms.get('email')
     password = request.forms.get('password')
     us = UserService()
-    if us.find_by_email(email):
+    existing_user = us.find_by_email(email)
+    if existing_user:
         return BaseController(auth_routes).render('register', error='Email já existe')
     us.create_user(name, email, password)
     # após registrar, redireciona para login
     return BaseController(auth_routes).redirect('/login')
+
+
+@auth_routes.get('/register')
+def register_redirect():
+    return BaseController(auth_routes).redirect('/signup')
 
 
 @auth_routes.get('/logout')

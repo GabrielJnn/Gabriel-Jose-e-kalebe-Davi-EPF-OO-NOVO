@@ -2,8 +2,25 @@
 from bottle import Bottle, request, redirect
 from services.watering_service import WateringService
 from services.plant_service import PlantService
+from controllers.base_controller import BaseController
 
 watering_routes = Bottle()
+
+
+@watering_routes.get('/plants/<pid:int>/watering/new')
+def water_plant_form(pid):
+    uid = request.get_cookie("user_id")
+    try:
+        uid = int(uid) if uid else None
+    except:
+        uid = None
+    if not uid:
+        return redirect('/login')
+    ps = PlantService()
+    p = ps.find_by_id(pid)
+    if not p or p.get('owner_id') != uid:
+        return redirect('/plants')
+    return BaseController(watering_routes).render('watering_form', plant=p, action=f'/plants/{pid}/water')
 
 
 @watering_routes.post('/plants/<pid:int>/water')

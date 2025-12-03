@@ -1,4 +1,4 @@
-from bottle import static_file
+from bottle import static_file, request
 
 
 class BaseController:
@@ -8,13 +8,26 @@ class BaseController:
 
     def _setup_base_routes(self):
         # rotas basicas
-        self.app.route('/', method='GET', callback=self.home_redirect)
+        self.app.route('/', method='GET', callback=self.home_page)
         self.app.route('/helper', method=['GET'], callback=self.helper)
         self.app.route('/static/<filename:path>', callback=self.serve_static)
 
-    def home_redirect(self):
-        # redireciona para plants
-        return self.redirect('/plants')
+    def home_page(self):
+        # verifica se usuário está logado
+        uid = self._get_logged_user_id()
+        if uid:
+            # usuário logado, vai para plantas
+            return self.redirect('/plants')
+        else:
+            # usuário não logado, mostra página inicial
+            return self.render('home')
+
+    def _get_logged_user_id(self):
+        uid = request.get_cookie("user_id")
+        try:
+            return int(uid) if uid else None
+        except:
+            return None
 
     def helper(self):
         return self.render('helper-final')

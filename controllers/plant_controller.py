@@ -47,7 +47,7 @@ def plant_create():
     return redirect('/plants')
 
 
-@plant_routes.get('/plants/edit/<pid:int>')
+@plant_routes.get('/plants/<pid:int>/edit')
 def plant_edit(pid):
     uid = _require_login()
     if not uid:
@@ -56,10 +56,10 @@ def plant_edit(pid):
     p = ps.find_by_id(pid)
     if not p or p.get('owner_id') != uid:
         return BaseController(plant_routes).redirect('/plants')
-    return BaseController(plant_routes).render('plant_form', plant=p, action=f'/plants/edit/{pid}', user_id=uid, error=None)
+    return BaseController(plant_routes).render('plant_form', plant=p, action=f'/plants/{pid}/edit', user_id=uid, error=None)
 
 
-@plant_routes.post('/plants/edit/<pid:int>')
+@plant_routes.post('/plants/<pid:int>/edit')
 def plant_update(pid):
     uid = _require_login()
     if not uid:
@@ -72,7 +72,7 @@ def plant_update(pid):
     return redirect('/plants')
 
 
-@plant_routes.post('/plants/delete/<pid:int>')
+@plant_routes.post('/plants/<pid:int>/delete')
 def plant_delete(pid):
     uid = _require_login()
     if not uid:

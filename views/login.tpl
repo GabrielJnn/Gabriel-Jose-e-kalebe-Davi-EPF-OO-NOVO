@@ -1,21 +1,49 @@
 % rebase('base.tpl')
 
-<div class="login-container">
-    <h2>Login</h2>
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-xl-4">
+        <div class="card">
+            <div class="card-header text-center">
+                <h3 class="mb-0">Entrar no PlantsVsTime</h3>
+            </div>
+            <div class="card-body">
+                % if error:
+                    <div class="alert alert-danger">
+                        ⚠️ {{ error }}
+                    </div>
+                % end
 
-    % if error:
-        <p style="color:red;">{{error}}</p>
-    % end
+                <form action="/login" method="post">
+                    <div class="mb-4">
+                        <label for="email" class="form-label">
+                            <span style="font-size: 1.1em;">📧</span> Email
+                        </label>
+                        <input type="email" class="form-control" id="email" name="email"
+                               required placeholder="seu@email.com">
+                    </div>
 
-    <form action="/login" method="post">
-        <label>Email:</label>
-        <input type="email" name="email" required>
+                    <div class="mb-4">
+                        <label for="password" class="form-label">
+                            <span style="font-size: 1.1em;">🔒</span> Senha
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password"
+                               required placeholder="Sua senha">
+                    </div>
 
-        <label>Senha:</label>
-        <input type="password" name="password" required>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">
+                            <span style="font-size: 1.1em;">🚀</span> Entrar no PlantsVsTime
+                        </button>
+                    </div>
+                </form>
 
-        <button type="submit">Entrar</button>
-    </form>
-
-    <p>Ainda não tem conta? <a href="/register">Criar conta</a></p>
+                <div class="text-center mt-4">
+                    <p class="mb-3" style="color: #7f8c8d;">Ainda não tem conta?</p>
+                    <a href="/signup" class="btn btn-outline-primary">
+                        <span style="font-size: 1.1em;">✨</span> Criar Minha Conta
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

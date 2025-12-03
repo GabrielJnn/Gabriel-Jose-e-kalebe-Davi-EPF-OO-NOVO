@@ -12,5 +12,33 @@
     "email": "gabriel.jn.resende@gmail.com",
     "birthdate": "",
     "password": "gabriel123"
+  },
+  {
+    "id": 3,
+    "name": "Test User",
+    "email": "test@example.com",
+    "birthdate": "",
+    "password": "test123"
+  },
+  {
+    "id": 4,
+    "name": "Usuario Unico",
+    "email": "unico123@exemplo.com",
+    "birthdate": "",
+    "password": "senha456"
+  },
+  {
+    "id": 5,
+    "name": "Usuario Teste Debug",
+    "email": "teste@debug.com",
+    "birthdate": "",
+    "password": "senha123"
+  },
+  {
+    "id": 6,
+    "name": "Usuario Signup",
+    "email": "signup@test.com",
+    "birthdate": "",
+    "password": "senha123"
   }
 ]

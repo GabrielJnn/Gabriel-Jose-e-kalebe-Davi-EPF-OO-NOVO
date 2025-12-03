@@ -36,7 +36,60 @@ class PlantService:
         return self._read()
 
     def get_by_owner(self, owner_id):
-        return [p for p in self._read() if p['owner_id'] == owner_id]
+        from services.watering_service import WateringService
+        from datetime import datetime, timedelta
+
+        ws = WateringService()
+
+        plants = [p for p in self._read() if p['owner_id'] == owner_id]
+
+        # Adicionar informação da última rega para cada planta
+        for plant in plants:
+            plant_waterings = ws.get_by_plant(plant['id'])
+            if plant_waterings:
+                # Ordenar por data (mais recente primeiro) e pegar a primeira
+                sorted_waterings = sorted(plant_waterings, key=lambda x: x['date'], reverse=True)
+                last_watering_date = sorted_waterings[0]['date']
+                plant['last_watering'] = last_watering_date
+
+                # Calcular quantos dias faltam para a próxima rega
+                try:
+                    last_date = datetime.strptime(last_watering_date, '%Y-%m-%d').date()
+                    interval_days = int(plant.get('watering_interval_days', 3))
+                    next_watering = last_date + timedelta(days=interval_days)
+                    today = datetime.now().date()
+
+                    if next_watering > today:
+                        days_until_next = (next_watering - today).days
+                        plant['days_until_next'] = days_until_next
+                        if days_until_next == 0:
+                            plant['watering_status'] = 'urgent'
+                            plant['watering_message'] = '🔥 Regar hoje!'
+                        elif days_until_next == 1:
+                            plant['watering_status'] = 'soon'
+                            plant['watering_message'] = '🕐 Regar amanhã'
+                        else:
+                            plant['watering_status'] = 'ok'
+                            plant['watering_message'] = f'✅ {days_until_next} dias'
+                    else:
+                        days_overdue = (today - next_watering).days
+                        plant['days_until_next'] = -days_overdue  # negativo = atrasado
+                        plant['watering_status'] = 'overdue'
+                        plant['watering_message'] = f'⚠️ {days_overdue} dias atrasada'
+                except (ValueError, KeyError):
+                    plant['days_until_next'] = None
+                    plant['watering_status'] = 'unknown'
+                    plant['watering_message'] = '❓ Erro no cálculo'
+            else:
+                # Nunca foi regada
+                plant['last_watering'] = None
+                plant['days_until_next'] = None
+                plant['watering_status'] = 'never'
+                plant['watering_message'] = '❓ Nunca regada'
+                plant['days_until_next_watering'] = None
+                plant['watering_status'] = 'never_watered'
+
+        return plants
 
     def find_by_id(self, pid):
         for p in self._read():
