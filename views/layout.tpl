@@ -1,22 +1,41 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Bottle - {{title or 'Sistema'}}</title>
-    <link rel="stylesheet" href="/static/css/style.css" />
+  <meta charset="utf-8" />
+  <title>PlantsVsTime</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-
+<body class="bg-light">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-success">
     <div class="container">
-        {{!base}}  <!-- O conteúdo das páginas filhas virá aqui -->
+      <a class="navbar-brand" href="/">PlantsVsTime</a>
+      <div class="collapse navbar-collapse">
+        % if user_id:
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item"><a class="nav-link" href="/plants">Minhas Plantas</a></li>
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="/logout">Sair</a></li>
+          </ul>
+        % else:
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="/register">Registrar</a></li>
+          </ul>
+        % end
+      </div>
     </div>
+  </nav>
 
-    <footer>
-        <p>&copy; 2025, Meu Projeto. Todos os direitos reservados.</p>
-    </footer>
+  <div class="container mt-4">
+    <div class="card p-3 shadow-sm">
+      % include
+    </div>
+  </div>
 
-    <!-- Scripts JS no final do body -->
-    <script src="/static/js/main.js"></script>
+  <footer class="text-center mt-4 mb-4 small text-muted">
+    PlantsVsTime - Projeto POO
+  </footer>
 </body>
 </html>
