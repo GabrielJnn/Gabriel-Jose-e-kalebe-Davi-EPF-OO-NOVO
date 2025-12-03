@@ -1,15 +1,21 @@
-# services/plant_service.py
+# services/plant_service.py - Serviço de Plantas
+# Esta classe gerencia todas as operações relacionadas às plantas (CRUD)
+
 import os
 import json
 from config import Config
 
+# Caminhos dos arquivos de dados
 DATA_DIR = Config.DATA_PATH
 PLANTS_FILE = os.path.join(DATA_DIR, 'plants.json')
 
 
 def _ensure():
+    # Garante que a pasta de dados existe
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR)
+
+    # Garante que o arquivo de plantas existe (cria vazio se não existir)
     if not os.path.exists(PLANTS_FILE):
         with open(PLANTS_FILE, 'w', encoding='utf-8') as f:
             json.dump([], f, indent=2, ensure_ascii=False)
@@ -17,6 +23,7 @@ def _ensure():
 
 class PlantService:
     def __init__(self):
+        # Inicializa o serviço garantindo que os arquivos existem
         _ensure()
 
     def _read(self):
@@ -36,14 +43,18 @@ class PlantService:
         return self._read()
 
     def get_by_owner(self, owner_id):
+        # === BUSCAR PLANTAS DO USUÁRIO COM STATUS DE REGA ===
+        # Esta função retorna as plantas do usuário com informações calculadas sobre próximas regas
+
         from services.watering_service import WateringService
         from datetime import datetime, timedelta
 
         ws = WateringService()
 
+        # Filtra apenas as plantas que pertencem ao usuário
         plants = [p for p in self._read() if p['owner_id'] == owner_id]
 
-        # Adicionar informação da última rega para cada planta
+        # === CALCULAR STATUS DE REGA PARA CADA PLANTA ===
         for plant in plants:
             plant_waterings = ws.get_by_plant(plant['id'])
             if plant_waterings:
