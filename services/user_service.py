@@ -1,52 +1,68 @@
-from models.user import UserModel, User
-from bottle import request
+# services/user_service.py
 import os
+import json
+from models.user import UserModel
+
+DATA_DIR = "data"
+USERS_FILE = os.path.join(DATA_DIR, "users.json")
 
 
 class UserService:
     def __init__(self):
+        # modelo que mexe no json
         self.model = UserModel()
 
+    # pega todos os usuarios
     def get_all(self):
-        return self.model.get_all()
+        return [u.to_dict() for u in self.model.get_all()]
 
-    def get_by_id(self, uid):
-        return self.model.get_by_id(uid)
+    # pega usuario por id
+    def get_by_id(self, user_id):
+        u = self.model.get_by_id(user_id)
+        return u.to_dict() if u else None
 
-    def create_user(self, name, email, password):
-        # checa email
-        if self.find_by_email(email):
-            return None
-        last = max([u.id for u in self.model.get_all()], default=0)
+    # procura email
+    def find_by_email(self, email):
+        u = self.model.get_by_email(email)
+        return u.to_dict() if u else None
+
+    # cria usuario simples (sem senha)
+    def create_user_simple(self, name, email, birthdate):
+        users = self.model.get_all()
+        last = max([u.id for u in users], default=0)
         new_id = last + 1
-        user = User(id=new_id, name=name, email=email,
-                    birthdate="", password=password)
+
+        # cria objeto usuario
+        user = self.model._make_user(new_id, name, email, birthdate, "")
         self.model.add_user(user)
         return user
 
-    def find_by_email(self, email):
-        for u in self.model.get_all():
-            if u.email == email:
-                return u
-        return None
+    # cria usuario com senha (registro)
+    def create_user(self, name, email, password):
+        users = self.model.get_all()
+        last = max([u.id for u in users], default=0)
+        new_id = last + 1
 
-    def authenticate(self, email, password):
-        u = self.find_by_email(email)
+        user = self.model._make_user(new_id, name, email, "", password)
+        self.model.add_user(user)
+        return user
+
+    # edita usuario
+    def edit_user_simple(self, user_id, name, email, birthdate):
+        # pega usuario
+        u = self.model.get_by_id(user_id)
         if not u:
             return None
-        if u.password == password:
-            return u
-        return None
 
-    def edit_user(self, user):
-        # formulario atualiza usuario (mantem password)
-        name = request.forms.get('name')
-        email = request.forms.get('email')
-        birthdate = request.forms.get('birthdate')
-        user.name = name
-        user.email = email
-        user.birthdate = birthdate
-        self.model.update_user(user)
+        # altera dados
+        u.name = name
+        u.email = email
+        u.birthdate = birthdate
 
-    def delete_user(self, uid):
-        self.model.delete_user(uid)
+        # salva tudo
+        self.model.save_all()
+        return u
+
+    # deleta usuario
+    def delete_user(self, user_id):
+        self.model.delete_user(user_id)

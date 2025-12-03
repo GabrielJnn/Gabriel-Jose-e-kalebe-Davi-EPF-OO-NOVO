@@ -1,23 +1,18 @@
-% rebase('layout.tpl', user_id=user_id)
-% block include
-<div class="d-flex justify-content-between">
-  <h3>Planta: {{plant['name']}}</h3>
-  <form method="post" action="/plants/{{plant['id']}}/water">
-    <button class="btn btn-primary" type="submit">Regar Agora</button>
-  </form>
-</div>
-<p>Espécie: {{plant['species']}} • Intervalo: {{plant['watering_interval_days']}} dias</p>
+% rebase('base.tpl')
 
-<h5>Registros de Rega</h5>
-% if not waterings:
-  <p>Ainda não há registros.</p>
+<h2>Histórico de Rega</h2>
+
+% if waterings:
+    <ul>
+    % for w in waterings:
+        <li>
+            Planta: <strong>{{w['plant_name']}}</strong><br>
+            Data: {{w['date']}}
+        </li>
+    % end
+    </ul>
 % else:
-  <ul>
-  % for w in waterings:
-    <li>{{w['date']}} (usuário #{{w['user_id']}})</li>
-  % end
-  </ul>
+    <p>Nenhuma rega registrada.</p>
 % end
 
-<p><a href="/plants" class="btn btn-secondary">Voltar</a></p>
-% end
+<p><a href="/plants">Voltar</a></p>

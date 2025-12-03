@@ -1,18 +1,21 @@
-% rebase('layout.tpl', user_id=None)
-% block include
-<h3>Login</h3>
-% if error:
-  <div class="alert alert-danger">{{error}}</div>
-% end
-<form method="post" action="/login">
-  <div class="mb-3">
-    <label>Email</label>
-    <input name="email" class="form-control" />
-  </div>
-  <div class="mb-3">
-    <label>Senha</label>
-    <input name="password" type="password" class="form-control" />
-  </div>
-  <button class="btn btn-primary" type="submit">Entrar</button>
-</form>
-% end
+% rebase('base.tpl')
+
+<div class="login-container">
+    <h2>Login</h2>
+
+    % if error:
+        <p style="color:red;">{{error}}</p>
+    % end
+
+    <form action="/login" method="post">
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <label>Senha:</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Entrar</button>
+    </form>
+
+    <p>Ainda não tem conta? <a href="/register">Criar conta</a></p>
+</div>

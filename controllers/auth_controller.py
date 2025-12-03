@@ -1,64 +1,57 @@
-from bottle import Bottle, request, redirect
+# controllers/auth_controller.py
+from bottle import Bottle, request, response
 from controllers.base_controller import BaseController
 from services.user_service import UserService
 
 auth_routes = Bottle()
-
-# cria BaseController apenas se este for montado separadamente (não duplicar root)
-BaseController(auth_routes)  # registra '/', '/static' etc (merge segura)
+BaseController(auth_routes)  # registra / e /static no root do merge
 
 
-class AuthController:
-    def __init__(self, app):
-        self.app = app
-        self.user_service = UserService()
-        self.setup_routes()
-
-    def setup_routes(self):
-        self.app.route('/login', method=['GET'], callback=self.login_get)
-        self.app.route('/login', method=['POST'], callback=self.login_post)
-        self.app.route('/register', method=['GET'], callback=self.register_get)
-        self.app.route(
-            '/register', method=['POST'], callback=self.register_post)
-        self.app.route('/logout', method=['GET'], callback=self.logout)
-
-    # views simples
-    def login_get(self):
-        return self.app.parent.render('login', error=None) if hasattr(self.app, 'parent') else self.app.request.environ.get('bottle.request').template('login', error=None)
-
-    def login_post(self):
-        email = request.forms.get('email')
-        password = request.forms.get('password')
-        user = self.user_service.authenticate(email, password)
-        if not user:
-            return self.app.parent.render('login', error='Email ou senha inválidos') if hasattr(self.app, 'parent') else self.app.request.environ.get('bottle.request').template('login', error='Email ou senha inválidos')
-        # set cookie simples
-        from bottle import response
-        response.set_cookie('user_id', str(user.id), path='/')
-        redirect('/plants')
-
-    def register_get(self):
-        return self.app.parent.render('register', error=None) if hasattr(self.app, 'parent') else self.app.request.environ.get('bottle.request').template('register', error=None)
-
-    def register_post(self):
-        name = request.forms.get('name')
-        email = request.forms.get('email')
-        password = request.forms.get('password')
-        # cria usuario
-        created = self.user_service.create_user(name, email, password)
-        if not created:
-            return self.app.parent.render('register', error='Email já existe') if hasattr(self.app, 'parent') else self.app.request.environ.get('bottle.request').template('register', error='Email já existe')
-        from bottle import response
-        # pega id do usuario criado
-        u = self.user_service.find_by_email(email)
-        response.set_cookie('user_id', str(u.id), path='/')
-        redirect('/plants')
-
-    def logout(self):
-        from bottle import response
-        response.set_cookie('user_id', "", path='/', expires=0)
-        redirect('/login')
+def _get_logged_user_id():
+    uid = request.get_cookie("user_id")
+    try:
+        return int(uid) if uid else None
+    except:
+        return None
 
 
-# monta controller no Bottle local
-AuthController(auth_routes)
+@auth_routes.get('/login')
+def login_get():
+    return BaseController(auth_routes).render('login', error=None)
+
+
+@auth_routes.post('/login')
+def login_post():
+    email = request.forms.get('email')
+    password = request.forms.get('password')
+    us = UserService()
+    user = us.find_by_email(email)
+    if not user or user.get('password') != password:
+        return BaseController(auth_routes).render('login', error='Email ou senha inválidos')
+    # set cookie simples
+    response.set_cookie("user_id", str(user.get('id')), path="/")
+    return BaseController(auth_routes).redirect('/plants')
+
+
+@auth_routes.get('/register')
+def register_get():
+    return BaseController(auth_routes).render('register', error=None)
+
+
+@auth_routes.post('/register')
+def register_post():
+    name = request.forms.get('name')
+    email = request.forms.get('email')
+    password = request.forms.get('password')
+    us = UserService()
+    if us.find_by_email(email):
+        return BaseController(auth_routes).render('register', error='Email já existe')
+    us.create_user(name, email, password)
+    # após registrar, redireciona para login
+    return BaseController(auth_routes).redirect('/login')
+
+
+@auth_routes.get('/logout')
+def logout():
+    response.set_cookie("user_id", "", path="/", expires=0)
+    return BaseController(auth_routes).redirect('/login')

@@ -1,22 +1,24 @@
-% rebase('layout.tpl', user_id=None)
-% block include
-<h3>Registrar</h3>
-% if error:
-  <div class="alert alert-danger">{{error}}</div>
-% end
-<form method="post" action="/register">
-  <div class="mb-3">
-    <label>Nome</label>
-    <input name="name" class="form-control" />
-  </div>
-  <div class="mb-3">
-    <label>Email</label>
-    <input name="email" class="form-control" />
-  </div>
-  <div class="mb-3">
-    <label>Senha</label>
-    <input name="password" type="password" class="form-control" />
-  </div>
-  <button class="btn btn-success" type="submit">Registrar</button>
-</form>
-% end
+% rebase('base.tpl')
+
+<div class="register-container">
+    <h2>Criar Conta</h2>
+
+    % if error:
+        <p style="color:red;">{{error}}</p>
+    % end
+
+    <form action="/register" method="post">
+        <label>Nome:</label>
+        <input type="text" name="name" required>
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <label>Senha:</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Registrar</button>
+    </form>
+
+    <p>Já tem conta? <a href="/login">Entrar</a></p>
+</div>

@@ -1,3 +1,4 @@
+# services/watering_service.py
 import os
 import json
 from config import Config
@@ -5,12 +6,14 @@ from config import Config
 DATA_DIR = Config.DATA_PATH
 W_FILE = os.path.join(DATA_DIR, 'waterings.json')
 
+
 def _ensure():
     if not os.path.exists(DATA_DIR):
         os.makedirs(DATA_DIR)
     if not os.path.exists(W_FILE):
         with open(W_FILE, 'w', encoding='utf-8') as f:
             json.dump([], f, indent=2, ensure_ascii=False)
+
 
 class WateringService:
     def __init__(self):
@@ -38,7 +41,8 @@ class WateringService:
     def create(self, plant_id, user_id, date):
         items = self._read()
         wid = self._next_id(items)
-        rec = {"id": wid, "plant_id": plant_id, "user_id": user_id, "date": date}
+        rec = {"id": wid, "plant_id": plant_id,
+               "user_id": user_id, "date": date}
         items.append(rec)
         self._write(items)
         return rec
