@@ -12,5 +12,12 @@
     "email": "gabriel.jn.resende@gmail.com",
     "birthdate": "",
     "password": "gabriel123"
+  },
+  {
+    "id": 3,
+    "name": "kalebe",
+    "email": "kalebedavi.silva@gmail.com",
+    "birthdate": "",
+    "password": "123"
   }
 ]
