@@ -1,42 +1,52 @@
-from bottle import request
 from models.user import UserModel, User
+from bottle import request
+import os
+
 
 class UserService:
     def __init__(self):
-        self.user_model = UserModel()
-
+        self.model = UserModel()
 
     def get_all(self):
-        users = self.user_model.get_all()
-        return users
+        return self.model.get_all()
 
+    def get_by_id(self, uid):
+        return self.model.get_by_id(uid)
 
-    def save(self):
-        last_id = max([u.id for u in self.user_model.get_all()], default=0)
-        new_id = last_id + 1
-        name = request.forms.get('name')
-        email = request.forms.get('email')
-        birthdate = request.forms.get('birthdate')
+    def create_user(self, name, email, password):
+        # checa email
+        if self.find_by_email(email):
+            return None
+        last = max([u.id for u in self.model.get_all()], default=0)
+        new_id = last + 1
+        user = User(id=new_id, name=name, email=email,
+                    birthdate="", password=password)
+        self.model.add_user(user)
+        return user
 
-        user = User(id=new_id, name=name, email=email, birthdate=birthdate)
-        self.user_model.add_user(user)
+    def find_by_email(self, email):
+        for u in self.model.get_all():
+            if u.email == email:
+                return u
+        return None
 
-
-    def get_by_id(self, user_id):
-        return self.user_model.get_by_id(user_id)
-
+    def authenticate(self, email, password):
+        u = self.find_by_email(email)
+        if not u:
+            return None
+        if u.password == password:
+            return u
+        return None
 
     def edit_user(self, user):
+        # formulario atualiza usuario (mantem password)
         name = request.forms.get('name')
         email = request.forms.get('email')
         birthdate = request.forms.get('birthdate')
-
         user.name = name
         user.email = email
         user.birthdate = birthdate
+        self.model.update_user(user)
 
-        self.user_model.update_user(user)
-
-
-    def delete_user(self, user_id):
-        self.user_model.delete_user(user_id)
+    def delete_user(self, uid):
+        self.model.delete_user(uid)
